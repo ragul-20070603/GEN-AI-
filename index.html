@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Resume Scanner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f7f9fc;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      background: #e6f0ff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔍 AI Resume Skill Matcher</h1>
+
+<form id="resumeForm">
+  <label for="job_role">Enter Job Role:</label>
+  <input type="text" id="job_role" name="job_role" required>
+
+  <label for="resume">Upload Resume (.pdf or .txt):</label>
+  <input type="file" id="resume" name="resume" accept=".pdf,.txt" required>
+
+  <button type="submit">Scan Resume</button>
+</form>
+
+<div id="result" style="display:none;"></div>
+
+<script>
+  const form = document.getElementById('resumeForm');
+  const resultDiv = document.getElementById('result');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    
+    try {
+      const response = await fetch('https://ee1fc0432851.ngrok-free.app/screen', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('Something went wrong!');
+
+      const data = await response.json();
+      
+      resultDiv.innerHTML = `
+        <h3>Results for: <em>${data.job_role}</em></h3>
+        <p><strong>Match Rate:</strong> ${data.match_rate}%</p>
+        <p><strong>Matched Skills:</strong> ${data.matched_skills.join(', ')}</p>
+        <p><strong>Missing Skills:</strong> ${data.missing_skills.join(', ')}</p>
+      `;
+      resultDiv.style.display = 'block';
+
+    } catch (err) {
+      resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      resultDiv.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>
